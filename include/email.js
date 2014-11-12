@@ -113,13 +113,24 @@ EmailService.prototype.send = function(from, to, subject, body, cb) {
             html: body
         };
 
-        smtpTransport.sendMail(mailOptions, function(err, response) {
-            if (util.isError(err)) {
-            	pb.log.error("EmailService: Failed to send email: ", err.stack);
-            }
-            smtpTransport.close();
+        var d = domain.create();
+        d.on('error', function(err) {
+            pb.log.error(err.stack);
+        });
+        d.once('error', function(err) {
+            cb(err);
+        });
+        d.add(smtpTransport);
+        d.run(function() {
+            
+            smtpTransport.sendMail(mailOptions, function(err, response) {
+                if (util.isError(err)) {
+                    pb.log.error("EmailService: Failed to send email: ", err.stack);
+                }
+                smtpTransport.close();
 
-            cb(err, response);
+                cb(err, response);
+            });
         });
     });
 };
