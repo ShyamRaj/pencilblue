@@ -76,7 +76,7 @@ UploadMediaController.prototype.render = function(cb) {
             //write the response
             var content = {
                 content: JSON.stringify({
-                    filename: sresult.mediaPath
+                    filename: sresult.mediaPath.split("\\").join("/")
                 }),
                 content_type: 'application/json'
             };
